@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora do Caio – Juros Compostos</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --blue: #1A6BF0; --blue-dark: #0F4DC5; --blue-light: #E8F0FE; --bg: #F4F7FF; --card: #FFFFFF; --text: #1A1F36; --muted: #6B7280; --border: #DDE3F0; --radius: 14px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    header { background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 100%); color: #fff; padding: 28px 20px 24px; text-align: center; }
+    header h1 { font-size: 1.5rem; font-weight: 700; } header p { font-size: 0.85rem; opacity: 0.8; margin-top: 4px; }
+    main { max-width: 520px; margin: 0 auto; padding: 20px 16px 48px; }
+    .card { background: var(--card); border-radius: var(--radius); padding: 22px 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(26,107,240,0.07); border: 1px solid var(--border); }
+    .card-title { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--blue); margin-bottom: 16px; }
+    .field { margin-bottom: 16px; } .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 0.8rem; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
+    .input-wrap { position: relative; display: flex; align-items: center; }
+    .input-prefix { position: absolute; left: 12px; font-size: 0.9rem; font-weight: 600; color: var(--muted); pointer-events: none; }
+    .input-suffix { position: absolute; right: 12px; font-size: 0.9rem; font-weight: 600; color: var(--muted); pointer-events: none; }
+    input[type="text"], input[type="number"], select { width: 100%; height: 48px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 1rem; font-weight: 600; color: var(--text); background: #fff; outline: none; appearance: none; }
+    input[type="number"] { padding: 0 12px 0 32px; } input[type="number"].no-prefix { padding: 0 12px; } input[type="number"].has-suffix { padding: 0 36px 0 12px; }
+    select { padding: 0 12px; cursor: pointer; }
+    input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,107,240,0.12); }
+    .toggle-group { display: flex; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; height: 48px; }
+    .toggle-group button { flex: 1; border: none; background: transparent; font-size: 0.85rem; font-weight: 600; color: var(--muted); cursor: pointer; }
+    .toggle-group button.active { background: var(--blue); color: #fff; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn-calc { width: 100%; height: 52px; background: linear-gradient(135deg, var(--blue-dark), var(--blue)); color: #fff; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 4px; }
+    #results { display: none; }
+    .result-hero { text-align: center; padding: 8px 0 16px; }
+    .result-hero .label-hero { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; color: var(--blue); margin-bottom: 6px; }
+    .result-hero .value-hero { font-size: 2.4rem; font-weight: 800; color: var(--text); letter-spacing: -1px; }
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .result-item { background: var(--blue-light); border-radius: 10px; padding: 14px 12px; text-align: center; }
+    .result-item .ri-label { font-size: 0.72rem; color: var(--blue-dark); font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+    .result-item .ri-value { font-size: 1.1rem; font-weight: 700; color: var(--blue-dark); }
+    .result-item.highlight { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+    .result-item.highlight .ri-label { color: #065f46; } .result-item.highlight .ri-value { color: #065f46; }
+    .chart-wrap { position: relative; height: 220px; margin-top: 4px; }
+    footer { text-align: center; font-size: 0.72rem; color: var(--muted); margin-top: 32px; }
+    footer a { color: var(--blue); text-decoration: none; }
+  </style>
+</head>
+<body>
+<header><h1>📈 Calculadora do Caio</h1><p>Simule o poder dos juros compostos</p></header>
+<main>
+  <div class="card">
+    <div class="card-title">Seus dados</div>
+    <div class="field"><label>Aporte inicial</label><div class="input-wrap"><span class="input-prefix">R$</span><input type="number" id="inicial" min="0" step="100" value="1000" /></div></div>
+    <div class="field"><label>Aporte mensal</label><div class="input-wrap"><span class="input-prefix">R$</span><input type="number" id="mensal" min="0" step="100" value="500" /></div></div>
+    <div class="two-col">
+      <div class="field"><label>Taxa de juros</label><div class="input-wrap"><input type="number" id="taxa" class="has-suffix" min="0" step="0.01" value="1" /><span class="input-suffix">%</span></div></div>
+      <div class="field"><label>Período</label><div class="toggle-group" id="periodoToggle"><button class="active" data-val="mes" onclick="setTipo(this)">Mês</button><button data-val="ano" onclick="setTipo(this)">Ano</button></div></div>
+    </div>
+    <div class="field"><label>Prazo</label><div class="two-col"><div class="input-wrap"><input type="number" id="prazo" class="no-prefix" min="1" step="1" value="24" /></div><select id="prazoUnidade"><option value="meses">Meses</option><option value="anos">Anos</option></select></div></div>
+    <button class="btn-calc" onclick="calcular()">Calcular</button>
+  </div>
+  <div class="card" id="results">
+    <div class="card-title">Resultado</div>
+    <div class="result-hero"><div class="label-hero">Valor final acumulado</div><div class="value-hero" id="r-total">—</div></div>
+    <div class="result-grid">
+      <div class="result-item"><div class="ri-label">Total investido</div><div class="ri-value" id="r-investido">—</div></div>
+      <div class="result-item highlight"><div class="ri-label">Juros ganhos</div><div class="ri-value" id="r-juros">—</div></div>
+    </div>
+  </div>
+  <div class="card" id="chartCard" style="display:none;"><div class="card-title">Evolução do patrimônio</div><div class="chart-wrap"><canvas id="myChart"></canvas></div></div>
+  <footer>Criado por <a href="#">Caio Parreira</a> · Simulação meramente educacional<br>Consulte sempre um assessor de investimentos</footer>
+</main>
+<script>
+  let tipoTaxa='mes',chartInstance=null;
+  function setTipo(btn){document.querySelectorAll('#periodoToggle button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');tipoTaxa=btn.dataset.val;}
+  function fmt(v){return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+  function calcular(){
+    const inicial=parseFloat(document.getElementById('inicial').value)||0;
+    const mensal=parseFloat(document.getElementById('mensal').value)||0;
+    let taxa=parseFloat(document.getElementById('taxa').value)||0;
+    const prazo=parseInt(document.getElementById('prazo').value)||0;
+    const unidade=document.getElementById('prazoUnidade').value;
+    if(taxa<=0||prazo<=0){alert('Preencha taxa e prazo corretamente.');return;}
+    let taxaMes=taxa/100;
+    if(tipoTaxa==='ano')taxaMes=Math.pow(1+taxa/100,1/12)-1;
+    const meses=unidade==='anos'?prazo*12:prazo;
+    let saldo=inicial,totalInvestido=inicial;
+    const labelsArr=[],saldoArr=[],investArr=[];
+    for(let i=1;i<=meses;i++){
+      saldo=saldo*(1+taxaMes)+mensal;totalInvestido+=mensal;
+      const step=Math.max(1,Math.floor(meses/24));
+      if(i%step===0||i===meses){labelsArr.push(i<24?i+'m':(i/12).toFixed(i%12===0?0:1)+'a');saldoArr.push(parseFloat(saldo.toFixed(2)));investArr.push(parseFloat(totalInvestido.toFixed(2)));}
+    }
+    const juros=saldo-totalInvestido;
+    document.getElementById('r-total').textContent=fmt(saldo);
+    document.getElementById('r-investido').textContent=fmt(totalInvestido);
+    document.getElementById('r-juros').textContent=fmt(juros);
+    document.getElementById('results').style.display='block';
+    document.getElementById('chartCard').style.display='block';
+    setTimeout(()=>document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'}),80);
+    if(chartInstance)chartInstance.destroy();
+    const ctx=document.getElementById('myChart').getContext('2d');
+    chartInstance=new Chart(ctx,{type:'line',data:{labels:labelsArr,datasets:[
+      {label:'Patrimônio total',data:saldoArr,borderColor:'#1A6BF0',backgroundColor:'rgba(26,107,240,0.10)',fill:true,tension:0.4,pointRadius:2,borderWidth:2.5},
+      {label:'Total investido',data:investArr,borderColor:'#94a3b8',backgroundColor:'transparent',fill:false,tension:0.4,pointRadius:0,borderWidth:1.5,borderDash:[5,4]}
+    ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{labels:{font:{size:11},color:'#6B7280',boxWidth:14}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+fmt(c.parsed.y)}}},
+    scales:{x:{ticks:{color:'#9ca3af',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#9ca3af',font:{size:10},callback:v=>'R$ '+(v>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(0,0,0,0.05)'}}}}});
+  }
+  window.addEventListener('load',calcular);
+</script>
+</body>
+</html>
