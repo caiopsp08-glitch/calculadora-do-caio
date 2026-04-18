@@ -8,42 +8,99 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --blue: #1E4DB7; --blue-dark: #0D2E7A; --blue-light: #EBF0FA; --bg: #F2F5FC; --card: #FFFFFF; --text: #1A1F36; --muted: #6B7280; --border: #DDE3F0; --radius: 14px; }
+
+    :root {
+      --blue:       #1E4DB7;
+      --blue-dark:  #0D2E7A;
+      --blue-light: #EBF0FA;
+      --bg:         #F2F5FC;
+      --card:       #FFFFFF;
+      --text:       #1A1F36;
+      --muted:      #6B7280;
+      --border:     #DDE3F0;
+      --radius:     14px;
+      --green:      #059669;
+      --yellow:     #D97706;
+      --red:        #DC2626;
+    }
+
     body { font-family: 'Montserrat', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
     header { background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 100%); color: #fff; padding: 28px 20px 24px; text-align: center; }
     header h1 { font-size: 1.75rem; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; }
     header p { font-size: 0.88rem; opacity: 0.85; margin-top: 6px; font-weight: 500; letter-spacing: 0.3px; }
-    main { max-width: 520px; margin: 0 auto; padding: 20px 16px 48px; }
-    .card { background: var(--card); border-radius: var(--radius); padding: 22px 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(13,46,122,0.08); border: 1px solid var(--border); }
-    .card-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--blue); margin-bottom: 16px; }
-    .field { margin-bottom: 16px; } .field:last-child { margin-bottom: 0; }
-    label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    main { max-width: 520px; margin: 0 auto; padding: 20px 16px 56px; }
+    .card { background: var(--card); border-radius: var(--radius); padding: 22px 20px; margin-bottom: 14px; box-shadow: 0 2px 14px rgba(13,46,122,0.07); border: 1px solid var(--border); transition: box-shadow 0.2s; }
+    .card:hover { box-shadow: 0 4px 20px rgba(13,46,122,0.11); }
+    .card-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--blue); margin-bottom: 16px; }
+    .field { margin-bottom: 14px; } .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.3px; }
     .input-wrap { position: relative; display: flex; align-items: center; }
-    .input-prefix { position: absolute; left: 12px; font-size: 0.9rem; font-weight: 600; color: var(--muted); pointer-events: none; }
-    .input-suffix { position: absolute; right: 12px; font-size: 0.9rem; font-weight: 600; color: var(--muted); pointer-events: none; }
-    input[type="number"], select { width: 100%; height: 48px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 1rem; font-weight: 600; font-family: 'Montserrat', sans-serif; color: var(--text); background: #fff; outline: none; transition: border-color 0.15s; appearance: none; }
-    input[type="number"] { padding: 0 12px 0 32px; } input[type="number"].no-prefix { padding: 0 12px; } input[type="number"].has-suffix { padding: 0 36px 0 12px; }
+    .input-prefix { position: absolute; left: 12px; font-size: 0.88rem; font-weight: 700; color: var(--muted); pointer-events: none; transition: color 0.2s; }
+    .input-suffix { position: absolute; right: 12px; font-size: 0.88rem; font-weight: 700; color: var(--muted); pointer-events: none; }
+    input[type="number"], select { width: 100%; height: 50px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 1rem; font-weight: 700; font-family: 'Montserrat', sans-serif; color: var(--text); background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s; appearance: none; }
+    input[type="number"] { padding: 0 12px 0 34px; } input[type="number"].no-prefix { padding: 0 12px; } input[type="number"].has-suffix { padding: 0 38px 0 12px; }
     select { padding: 0 12px; cursor: pointer; }
-    input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(30,77,183,0.12); }
-    .toggle-group { display: flex; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; height: 48px; }
-    .toggle-group button { flex: 1; border: none; background: transparent; font-size: 0.85rem; font-weight: 700; font-family: 'Montserrat', sans-serif; color: var(--muted); cursor: pointer; transition: background 0.15s, color 0.15s; }
-    .toggle-group button.active { background: var(--blue); color: #fff; }
+    input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(30,77,183,0.13); transform: translateY(-1px); }
+    .input-wrap:focus-within .input-prefix { color: var(--blue); }
+    .range-wrap { margin-top: 8px; }
+    input[type="range"] { width: 100%; height: 4px; -webkit-appearance: none; appearance: none; background: var(--border); border-radius: 2px; outline: none; cursor: pointer; transform: none; border: none; box-shadow: none; padding: 0; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: var(--blue); border-radius: 50%; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 1px 4px rgba(30,77,183,0.3); }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); box-shadow: 0 2px 8px rgba(30,77,183,0.4); }
+    input[type="range"]:focus { box-shadow: none; transform: none; border: none; }
+    .range-labels { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--muted); font-weight: 600; margin-top: 3px; }
+    .toggle-group { display: flex; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; height: 50px; background: #f8faff; }
+    .toggle-group button { flex: 1; border: none; background: transparent; font-size: 0.85rem; font-weight: 700; font-family: 'Montserrat', sans-serif; color: var(--muted); cursor: pointer; transition: background 0.2s, color 0.2s, transform 0.1s; }
+    .toggle-group button:active { transform: scale(0.96); }
+    .toggle-group button.active { background: var(--blue); color: #fff; box-shadow: inset 0 1px 3px rgba(0,0,0,0.15); }
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .btn-calc { width: 100%; height: 52px; background: linear-gradient(135deg, var(--blue-dark), var(--blue)); color: #fff; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 700; font-family: 'Montserrat', sans-serif; letter-spacing: 0.5px; cursor: pointer; transition: opacity 0.15s, transform 0.1s; margin-top: 4px; }
-    .btn-calc:active { transform: scale(0.98); opacity: 0.9; }
-    #results { display: none; }
-    .result-hero { text-align: center; padding: 8px 0 16px; }
-    .result-hero .label-hero { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--blue); margin-bottom: 6px; }
-    .result-hero .value-hero { font-size: 2.4rem; font-weight: 800; color: var(--text); letter-spacing: -1px; }
-    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
-    .result-item { background: var(--blue-light); border-radius: 10px; padding: 14px 12px; text-align: center; }
-    .result-item .ri-label { font-size: 0.68rem; color: var(--blue-dark); font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 4px; }
-    .result-item .ri-value { font-size: 1.1rem; font-weight: 700; color: var(--blue-dark); }
-    .result-item.highlight { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
-    .result-item.highlight .ri-label { color: #065f46; } .result-item.highlight .ri-value { color: #065f46; font-size: 1.15rem; }
-    .chart-wrap { position: relative; height: 220px; margin-top: 4px; }
-    footer { text-align: center; font-size: 0.7rem; color: var(--muted); margin-top: 32px; font-weight: 500; }
-    footer a { color: var(--blue); text-decoration: none; }
+    .taxas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .taxa-item { background: var(--bg); border-radius: 10px; padding: 10px 12px; border: 1.5px solid var(--border); transition: border-color 0.2s; }
+    .taxa-item:focus-within { border-color: var(--blue); }
+    .taxa-label { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; } .dot-selic { background: #10b981; } .dot-poup { background: #f59e0b; }
+    .taxa-input-wrap { position: relative; }
+    .taxa-input { width: 100%; height: 38px; border: none; background: transparent; font-size: 0.95rem; font-weight: 700; font-family: 'Montserrat', sans-serif; color: var(--text); outline: none; padding: 0 28px 0 0; }
+    .taxa-suffix { position: absolute; right: 0; top: 50%; transform: translateY(-50%); font-size: 0.85rem; font-weight: 700; color: var(--muted); }
+    .taxa-sub { font-size: 0.62rem; color: var(--muted); font-weight: 500; margin-top: 2px; }
+    .btn-calc { width: 100%; height: 54px; background: linear-gradient(135deg, var(--blue-dark), var(--blue)); color: #fff; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 800; font-family: 'Montserrat', sans-serif; letter-spacing: 0.8px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s; margin-top: 6px; position: relative; overflow: hidden; box-shadow: 0 4px 14px rgba(13,46,122,0.25); }
+    .btn-calc:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(13,46,122,0.32); }
+    .btn-calc:active { transform: scale(0.97); opacity: 0.9; }
+    .ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.35); transform: scale(0); animation: ripple-anim 0.55s linear; pointer-events: none; }
+    @keyframes ripple-anim { to { transform: scale(4); opacity: 0; } }
+    #resultsSection { display: none; }
+    .result-hero { text-align: center; padding: 6px 0 18px; }
+    .label-hero { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--blue); margin-bottom: 4px; }
+    .value-hero { font-size: 2.5rem; font-weight: 900; color: var(--text); letter-spacing: -1.5px; transition: color 0.3s; }
+    .value-sub { font-size: 0.72rem; color: var(--muted); font-weight: 600; margin-top: 4px; }
+    .result-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .r-item { background: var(--blue-light); border-radius: 10px; padding: 12px 10px; text-align: center; }
+    .r-item .ri-l { font-size: 0.65rem; color: var(--blue-dark); font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
+    .r-item .ri-v { font-size: 1rem; font-weight: 800; color: var(--blue-dark); }
+    .r-item.green-card { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+    .r-item.green-card .ri-l { color: #065f46; } .r-item.green-card .ri-v { color: #065f46; }
+    .comp-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+    .comp-list { display: flex; flex-direction: column; gap: 10px; }
+    .comp-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border-radius: 10px; padding: 12px 14px; border: 1.5px solid var(--border); transition: border-color 0.2s, transform 0.15s; }
+    .comp-item:hover { transform: translateX(3px); }
+    .comp-item.winner { border-color: var(--blue); background: var(--blue-light); }
+    .comp-left { display: flex; align-items: center; gap: 10px; }
+    .comp-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .comp-name { font-size: 0.82rem; font-weight: 700; color: var(--text); }
+    .comp-rate { font-size: 0.68rem; font-weight: 600; color: var(--muted); margin-top: 1px; }
+    .comp-right { text-align: right; }
+    .comp-value { font-size: 0.95rem; font-weight: 800; color: var(--text); }
+    .comp-diff { font-size: 0.65rem; font-weight: 700; margin-top: 2px; }
+    .comp-diff.pos { color: var(--green); } .comp-diff.neg { color: var(--red); }
+    .badge-winner { font-size: 0.6rem; font-weight: 700; background: var(--blue); color: #fff; padding: 2px 7px; border-radius: 20px; margin-left: 6px; letter-spacing: 0.3px; }
+    .chart-wrap { position: relative; height: 230px; margin-top: 4px; }
+    .presets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .preset-btn { padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border); background: #fff; font-size: 0.72rem; font-weight: 700; font-family: 'Montserrat', sans-serif; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+    .preset-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+    .preset-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+    footer { text-align: center; font-size: 0.68rem; color: var(--muted); margin-top: 32px; font-weight: 500; line-height: 1.8; }
+    footer a { color: var(--blue); text-decoration: none; font-weight: 700; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-up { animation: fadeUp 0.35s ease both; }
   </style>
 </head>
 <body>
@@ -54,62 +111,122 @@
 <main>
   <div class="card">
     <div class="card-title">Seus dados</div>
-    <div class="field"><label>Aporte inicial</label><div class="input-wrap"><span class="input-prefix">R$</span><input type="number" id="inicial" placeholder="0,00" min="0" step="100" value="1000" /></div></div>
-    <div class="field"><label>Aporte mensal</label><div class="input-wrap"><span class="input-prefix">R$</span><input type="number" id="mensal" placeholder="0,00" min="0" step="100" value="500" /></div></div>
+    <div class="field">
+      <label>Aporte inicial</label>
+      <div class="input-wrap"><span class="input-prefix">R$</span><input type="number" id="inicial" min="0" step="500" value="5000" oninput="syncSlider('inicial');calcular()" /></div>
+      <div class="range-wrap"><input type="range" id="sl-inicial" min="0" max="500000" step="500" value="5000" oninput="syncInput('inicial');calcular()" /><div class="range-labels"><span>R$ 0</span><span>R$ 500k</span></div></div>
+    </div>
+    <div class="field">
+      <label>Aporte mensal</label>
+      <div class="input-wrap"><span class="input-prefix">R$</span><input type="number" id="mensal" min="0" step="100" value="500" oninput="syncSlider('mensal');calcular()" /></div>
+      <div class="range-wrap"><input type="range" id="sl-mensal" min="0" max="50000" step="100" value="500" oninput="syncInput('mensal');calcular()" /><div class="range-labels"><span>R$ 0</span><span>R$ 50k</span></div></div>
+    </div>
     <div class="two-col">
-      <div class="field"><label>Taxa de juros</label><div class="input-wrap"><input type="number" id="taxa" class="has-suffix" placeholder="0" min="0" step="0.01" value="1" /><span class="input-suffix">%</span></div></div>
-      <div class="field"><label>Período</label><div class="toggle-group" id="periodoToggle"><button class="active" data-val="mes" onclick="setTipo(this)">Mês</button><button data-val="ano" onclick="setTipo(this)">Ano</button></div></div>
+      <div class="field">
+        <label>Taxa de juros</label>
+        <div class="input-wrap"><input type="number" id="taxa" class="has-suffix" min="0" step="0.1" value="1" oninput="syncSlider('taxa');calcular()" /><span class="input-suffix">%</span></div>
+        <div class="range-wrap"><input type="range" id="sl-taxa" min="0" max="5" step="0.05" value="1" oninput="syncInput('taxa');calcular()" /><div class="range-labels"><span>0%</span><span>5%</span></div></div>
+      </div>
+      <div class="field">
+        <label>Período</label>
+        <div class="toggle-group" id="periodoToggle"><button class="active" data-val="mes" onclick="setTipo(this)">Mês</button><button data-val="ano" onclick="setTipo(this)">Ano</button></div>
+      </div>
     </div>
-    <div class="field"><label>Prazo</label><div class="two-col"><div class="input-wrap"><input type="number" id="prazo" class="no-prefix" placeholder="0" min="1" step="1" value="24" /></div><select id="prazoUnidade"><option value="meses">Meses</option><option value="anos">Anos</option></select></div></div>
-    <button class="btn-calc" onclick="calcular()">Calcular</button>
-  </div>
-  <div class="card" id="results">
-    <div class="card-title">Resultado</div>
-    <div class="result-hero"><div class="label-hero">Valor final acumulado</div><div class="value-hero" id="r-total">—</div></div>
-    <div class="result-grid">
-      <div class="result-item"><div class="ri-label">Total investido</div><div class="ri-value" id="r-investido">—</div></div>
-      <div class="result-item highlight"><div class="ri-label">Juros ganhos</div><div class="ri-value" id="r-juros">—</div></div>
+    <div class="field">
+      <label>Prazo</label>
+      <div class="presets" id="presets"><button class="preset-btn" onclick="setPrazo(6,'meses',this)">6m</button><button class="preset-btn" onclick="setPrazo(1,'anos',this)">1a</button><button class="preset-btn" onclick="setPrazo(2,'anos',this)">2a</button><button class="preset-btn active" onclick="setPrazo(5,'anos',this)">5a</button><button class="preset-btn" onclick="setPrazo(10,'anos',this)">10a</button><button class="preset-btn" onclick="setPrazo(20,'anos',this)">20a</button><button class="preset-btn" onclick="setPrazo(30,'anos',this)">30a</button></div>
+      <div class="two-col"><div class="input-wrap"><input type="number" id="prazo" class="no-prefix" min="1" step="1" value="5" oninput="clearPreset();calcular()" /></div><select id="prazoUnidade" onchange="calcular()"><option value="meses">Meses</option><option value="anos" selected>Anos</option></select></div>
     </div>
   </div>
-  <div class="card" id="chartCard" style="display:none;"><div class="card-title">Evolução do patrimônio</div><div class="chart-wrap"><canvas id="myChart"></canvas></div></div>
-  <footer>Criado por <a href="#">Caio Parreira</a> · Simulação meramente educacional<br>Consulte sempre um assessor de investimentos</footer>
+  <div class="card">
+    <div class="card-title">Comparativo de taxas</div>
+    <div class="taxas-grid">
+      <div class="taxa-item"><div class="taxa-label"><span class="dot dot-selic"></span> Selic</div><div class="taxa-input-wrap"><input type="number" class="taxa-input" id="taxaSelic" value="14.75" min="0" step="0.25" oninput="calcular()" /><span class="taxa-suffix">% a.a.</span></div><div class="taxa-sub">Ajuste conforme COPOM</div></div>
+      <div class="taxa-item"><div class="taxa-label"><span class="dot dot-poup"></span> Poupança</div><div class="taxa-input-wrap"><input type="number" class="taxa-input" id="taxaPoup" value="10.33" min="0" step="0.1" oninput="calcular()" /><span class="taxa-suffix">% a.a.</span></div><div class="taxa-sub">70% da Selic (Selic &gt; 8,5%)</div></div>
+    </div>
+  </div>
+  <div id="resultsSection">
+    <div class="card fade-up" id="heroCard">
+      <div class="card-title">Seu investimento</div>
+      <div class="result-hero">
+        <div class="label-hero">Valor final acumulado</div>
+        <div class="value-hero" id="r-total">—</div>
+        <div class="value-sub" id="r-sub">—</div>
+      </div>
+      <div class="result-grid-2">
+        <div class="r-item"><div class="ri-l">Total investido</div><div class="ri-v" id="r-investido">—</div></div>
+        <div class="r-item green-card"><div class="ri-l">Juros ganhos</div><div class="ri-v" id="r-juros">—</div></div>
+      </div>
+    </div>
+    <div class="card fade-up" id="compCard">
+      <div class="comp-title">Comparativo final</div>
+      <div class="comp-list" id="compList"></div>
+    </div>
+    <div class="card fade-up" id="chartCard">
+      <div class="card-title">Evolução do patrimônio</div>
+      <div class="chart-wrap"><canvas id="myChart"></canvas></div>
+    </div>
+  </div>
+  <footer>Criado por <a href="#">Caio Parreira</a> · Simulação meramente educacional<br>Consulte sempre um assessor de investimentos qualificado</footer>
 </main>
 <script>
-  let tipoTaxa='mes',chartInstance=null;
-  function setTipo(btn){document.querySelectorAll('#periodoToggle button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');tipoTaxa=btn.dataset.val;}
-  function fmt(v){return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+  let tipoTaxa='mes', chartInstance=null, animFrame=null;
+  function syncSlider(id){const v=parseFloat(document.getElementById(id).value)||0;const sl=document.getElementById('sl-'+id);if(sl)sl.value=v;}
+  function syncInput(id){const v=parseFloat(document.getElementById('sl-'+id).value)||0;document.getElementById(id).value=v;}
+  function setTipo(btn){document.querySelectorAll('#periodoToggle button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');tipoTaxa=btn.dataset.val;calcular();}
+  function setPrazo(val,unidade,btn){document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('prazo').value=val;document.getElementById('prazoUnidade').value=unidade;calcular();}
+  function clearPreset(){document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));}
+  function fmt(val){return val.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+  function fmtShort(val){if(val>=1e6)return 'R$ '+(val/1e6).toFixed(2).replace('.',',')+' M';if(val>=1e3)return 'R$ '+(val/1e3).toFixed(1).replace('.',',')+' k';return fmt(val);}
+  function animateValue(el,from,to,dur){if(animFrame)cancelAnimationFrame(animFrame);const start=performance.now();function step(ts){const p=Math.min((ts-start)/dur,1);const e=1-Math.pow(1-p,3);el.textContent=fmt(from+(to-from)*e);if(p<1)animFrame=requestAnimationFrame(step);}requestAnimationFrame(step);}
+  function addRipple(btn,ev){const r=btn.getBoundingClientRect();const el=document.createElement('span');el.className='ripple';const size=Math.max(r.width,r.height);el.style.cssText='width:'+size+'px;height:'+size+'px;left:'+(ev.clientX-r.left-size/2)+'px;top:'+(ev.clientY-r.top-size/2)+'px';btn.appendChild(el);setTimeout(()=>el.remove(),600);}
+  function aaToMes(pct){return Math.pow(1+pct/100,1/12)-1;}
+  let prevTotal=0;
   function calcular(){
     const inicial=parseFloat(document.getElementById('inicial').value)||0;
     const mensal=parseFloat(document.getElementById('mensal').value)||0;
     let taxa=parseFloat(document.getElementById('taxa').value)||0;
     const prazo=parseInt(document.getElementById('prazo').value)||0;
     const unidade=document.getElementById('prazoUnidade').value;
-    if(taxa<=0||prazo<=0){alert('Preencha taxa e prazo corretamente.');return;}
-    let taxaMes=taxa/100;
-    if(tipoTaxa==='ano')taxaMes=Math.pow(1+taxa/100,1/12)-1;
+    const selicAA=parseFloat(document.getElementById('taxaSelic').value)||0;
+    const poupAA=parseFloat(document.getElementById('taxaPoup').value)||0;
+    if(prazo<=0)return;
+    let taxaMes=tipoTaxa==='ano'?aaToMes(taxa):taxa/100;
+    const selicMes=aaToMes(selicAA);
+    const poupMes=aaToMes(poupAA);
     const meses=unidade==='anos'?prazo*12:prazo;
-    let saldo=inicial,totalInvestido=inicial;
-    const labelsArr=[],saldoArr=[],investArr=[];
-    for(let i=1;i<=meses;i++){
-      saldo=saldo*(1+taxaMes)+mensal;totalInvestido+=mensal;
-      const step=Math.max(1,Math.floor(meses/24));
-      if(i%step===0||i===meses){labelsArr.push(i<24?i+'m':(i/12).toFixed(i%12===0?0:1)+'a');saldoArr.push(parseFloat(saldo.toFixed(2)));investArr.push(parseFloat(totalInvestido.toFixed(2)));}
-    }
-    const juros=saldo-totalInvestido;
-    document.getElementById('r-total').textContent=fmt(saldo);
+    function calcSerie(tm){let saldo=inicial,inv=inicial;const sArr=[],iArr=[];const step=Math.max(1,Math.floor(meses/36));for(let i=1;i<=meses;i++){saldo=saldo*(1+tm)+mensal;inv+=mensal;if(i%step===0||i===meses){sArr.push(parseFloat(saldo.toFixed(2)));iArr.push(parseFloat(inv.toFixed(2)));}}return{final:saldo,invested:inv,sArr,iArr};}
+    const user=calcSerie(taxaMes);const selic=calcSerie(selicMes);const poup=calcSerie(poupMes);
+    const totalInvestido=user.invested;const juros=user.final-totalInvestido;
+    const step=Math.max(1,Math.floor(meses/36));const labels=[];
+    for(let i=step;i<=meses;i+=step){if(i!==meses)labels.push(i<24?i+'m':Math.round(i/12)+'a');}
+    labels.push(meses<24?meses+'m':Math.round(meses/12)+'a');
+    const section=document.getElementById('resultsSection');const wasHidden=section.style.display!=='block';section.style.display='block';
+    animateValue(document.getElementById('r-total'),prevTotal,user.final,600);prevTotal=user.final;
     document.getElementById('r-investido').textContent=fmt(totalInvestido);
     document.getElementById('r-juros').textContent=fmt(juros);
-    document.getElementById('results').style.display='block';
-    document.getElementById('chartCard').style.display='block';
-    setTimeout(()=>document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'}),80);
+    document.getElementById('r-sub').textContent=meses+' meses · retorno de '+(juros/totalInvestido*100).toFixed(1)+'%';
+    const benchmarks=[
+      {name:'Seu investimento',rate:taxa+(tipoTaxa==='ano'?'% a.a.':'% a.m.'),final:user.final,color:'#1E4DB7',dot:'#1E4DB7'},
+      {name:'Selic (100%)',rate:selicAA+'% a.a.',final:selic.final,color:'#10b981',dot:'#10b981'},
+      {name:'Poupança',rate:poupAA+'% a.a.',final:poup.final,color:'#f59e0b',dot:'#f59e0b'}
+    ].sort((a,b)=>b.final-a.final);
+    const compList=document.getElementById('compList');
+    compList.innerHTML=benchmarks.map((b,i)=>{
+      const diff=b.final-totalInvestido;
+      const isWinner=i===0;
+      const vsUser=b.name!=='Seu investimento'?(user.final-b.final):null;
+      return '<div class="comp-item '+(isWinner?'winner':'')+'">'+'<div class="comp-left"><span class="comp-dot" style="background:'+b.dot+'"></span><div><div class="comp-name">'+b.name+(isWinner?'<span class="badge-winner">🏆 melhor</span>':'')+'</div><div class="comp-rate">'+b.rate+'</div></div></div>'+'<div class="comp-right"><div class="comp-value">'+fmt(b.final)+'</div><div class="comp-diff pos">+'+fmt(diff)+' em juros</div>'+(vsUser!==null?'<div class="comp-diff '+(vsUser>0?'pos':'neg')+'">'+(vsUser>0?'▲ você ganha ':'▼ você perde ')+fmt(Math.abs(vsUser))+'</div>':'')+'</div></div>';
+    }).join('');
     if(chartInstance)chartInstance.destroy();
     const ctx=document.getElementById('myChart').getContext('2d');
-    chartInstance=new Chart(ctx,{type:'line',data:{labels:labelsArr,datasets:[
-      {label:'Patrimônio total',data:saldoArr,borderColor:'#1E4DB7',backgroundColor:'rgba(30,77,183,0.10)',fill:true,tension:0.4,pointRadius:2,borderWidth:2.5},
-      {label:'Total investido',data:investArr,borderColor:'#94a3b8',backgroundColor:'transparent',fill:false,tension:0.4,pointRadius:0,borderWidth:1.5,borderDash:[5,4]}
-    ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    plugins:{legend:{labels:{font:{size:11,family:'Montserrat'},color:'#6B7280',boxWidth:14}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+fmt(c.parsed.y)}}},
-    scales:{x:{ticks:{color:'#9ca3af',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#9ca3af',font:{size:10},callback:v=>'R$ '+(v>=1000?(v/1000).toFixed(0)+'k':v)},grid:{color:'rgba(0,0,0,0.04)'}}}}});
+    chartInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[
+      {label:'Seu investimento',data:user.sArr,borderColor:'#1E4DB7',backgroundColor:'rgba(30,77,183,0.08)',fill:true,tension:0.4,pointRadius:0,borderWidth:2.5},
+      {label:'Selic (100%)',data:selic.sArr,borderColor:'#10b981',backgroundColor:'transparent',fill:false,tension:0.4,pointRadius:0,borderWidth:2},
+      {label:'Poupança',data:poup.sArr,borderColor:'#f59e0b',backgroundColor:'transparent',fill:false,tension:0.4,pointRadius:0,borderWidth:2},
+      {label:'Total investido',data:user.iArr,borderColor:'#cbd5e1',backgroundColor:'transparent',fill:false,tension:0,pointRadius:0,borderWidth:1.5,borderDash:[5,5]}
+    ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{font:{size:10,family:'Montserrat',weight:'600'},color:'#6B7280',boxWidth:12,padding:14}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+fmt(c.parsed.y)}}},scales:{x:{ticks:{color:'#9ca3af',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#9ca3af',font:{size:9},callback:v=>fmtShort(v)},grid:{color:'rgba(0,0,0,0.04)'}}}}});
+    if(wasHidden)setTimeout(()=>document.getElementById('heroCard').scrollIntoView({behavior:'smooth',block:'start'}),100);
   }
   window.addEventListener('load',calcular);
 </script>
