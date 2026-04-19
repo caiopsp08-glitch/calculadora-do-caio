@@ -174,6 +174,133 @@
       color: #D4A017;
     }
 
+    /* ── LEAD MODAL ── */
+    .lead-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 14, 28, 0.82);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .lead-overlay.open { display: flex; }
+
+    .lead-modal {
+      background: #0D1F3C;
+      border: 1px solid rgba(212, 160, 23, 0.30);
+      border-radius: 20px;
+      padding: 40px 36px 36px;
+      max-width: 420px;
+      width: 100%;
+      position: relative;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(212,160,23,0.08);
+    }
+
+    .lead-modal-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 20px 20px 0 0;
+      background: linear-gradient(90deg, #B8860B 0%, #D4A017 45%, #F0C040 70%, #D4A017 100%);
+    }
+
+    .lead-modal-close {
+      position: absolute;
+      top: 14px; right: 16px;
+      background: none; border: none;
+      color: rgba(255,255,255,0.35);
+      font-size: 1.4rem;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .lead-modal-close:hover { color: rgba(255,255,255,0.75); }
+
+    .lead-modal-icon {
+      width: 50px; height: 50px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(212,160,23,0.35);
+      background: rgba(212,160,23,0.07);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .lead-modal h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: #fff;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .lead-modal p {
+      font-size: 0.82rem;
+      color: #7a9bbf;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .lead-field {
+      margin-bottom: 14px;
+    }
+
+    .lead-field label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #7a9bbf;
+      margin-bottom: 6px;
+    }
+
+    .lead-field input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 9px;
+      border: 1.5px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .lead-field input::placeholder { color: rgba(255,255,255,0.25); }
+    .lead-field input:focus { border-color: rgba(212,160,23,0.55); background: rgba(212,160,23,0.04); }
+
+    .lead-btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 13px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #C8950A 0%, #E8B820 100%);
+      color: #0D1F3C;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .lead-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+    .lead-btn:active { transform: translateY(0); }
+    .lead-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .lead-privacy {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.22);
+    }
+
     @media (max-width: 760px) {
       header { padding: 18px 20px; flex-wrap: wrap; gap: 16px; }
       .header-right { width: 100%; justify-content: flex-start; }
@@ -636,7 +763,7 @@
       <span>Agendar um horário</span>
     </a>
     <div class="divider-v"></div>
-    <a class="btn-simular" href="#calculadora">
+    <a class="btn-simular" href="#" onclick="abrirLeadModal(event)">
       <span>Simular Agora</span>
     </a>
   </div>
@@ -810,7 +937,7 @@
 
   /* ---- TOGGLE ---- */
   function setTipo(btn) {
-    document.querySelectorAll('#periodoToggle buttn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#periodoToggle button').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     tipoTaxa = btn.dataset.val;
     calcular();
@@ -1048,7 +1175,99 @@
   }
 
   window.addEventListener('load', calcular);
+
+  /* ── LEAD MODAL ── */
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw17-ed3TWiN-ojOD99yzraO2W0wDeE9OUvSQkBV1F7ZpveMQNHfyMPctCp2mmqzNZtMg/exec';
+  let leadEnviado = false;
+
+  function abrirLeadModal(e) {
+    if (e) e.preventDefault();
+    if (leadEnviado) {
+      document.getElementById('calculadora').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    document.getElementById('leadOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('leadNome').focus(), 100);
+  }
+
+  function fecharLeadModal() {
+    document.getElementById('leadOverlay').classList.remove('open');
+  }
+
+  // fechar clicando fora
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('leadOverlay').addEventListener('click', function(e) {
+      if (e.target === this) fecharLeadModal();
+    });
+
+    document.getElementById('leadForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('leadSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Enviando…';
+
+      const nome     = document.getElementById('leadNome').value.trim();
+      const email    = document.getElementById('leadEmail').value.trim();
+      const whatsapp = document.getElementById('leadWhatsapp').value.trim();
+
+      // capturar valores atuais da calculadora
+      const inicial   = document.getElementById('inicial').value || '';
+      const mensal    = document.getElementById('mensal').value || '';
+      const taxa      = document.getElementById('taxa').value || '';
+      const prazo     = document.getElementById('prazo').value + ' ' + document.getElementById('prazoUnidade').value;
+      const resultado = document.getElementById('r-total').textContent || '';
+
+      try {
+        await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email, whatsapp, inicial, mensal, taxa, prazo, resultado })
+        });
+      } catch(err) { /* silently continue */ }
+
+      leadEnviado = true;
+      fecharLeadModal();
+      setTimeout(() => document.getElementById('calculadora').scrollIntoView({ behavior: 'smooth' }), 150);
+    });
+  });
 </script>
+
+<!-- LEAD MODAL -->
+<div class="lead-overlay" id="leadOverlay">
+  <div class="lead-modal">
+    <div class="lead-modal-bar"></div>
+    <button class="lead-modal-close" onclick="fecharLeadModal()" aria-label="Fechar">×</button>
+
+    <div class="lead-modal-icon">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+        <polyline points="3,20 9,14 13,18 18,10 23,5" stroke="#D4A017" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="23" cy="5" r="2" fill="#D4A017"/>
+      </svg>
+    </div>
+
+    <h2>Veja seu resultado</h2>
+    <p>Preencha rapidinho para liberar a simulação completa com comparativo de rentabilidade.</p>
+
+    <form id="leadForm" novalidate>
+      <div class="lead-field">
+        <label>Seu nome</label>
+        <input type="text" id="leadNome" placeholder="João Silva" required autocomplete="name" />
+      </div>
+      <div class="lead-field">
+        <label>E-mail</label>
+        <input type="email" id="leadEmail" placeholder="joao@email.com" required autocomplete="email" />
+      </div>
+      <div class="lead-field">
+        <label>WhatsApp</label>
+        <input type="tel" id="leadWhatsapp" placeholder="(35) 99999-9999" required autocomplete="tel" />
+      </div>
+      <button type="submit" class="lead-btn" id="leadSubmitBtn">Ver minha simulação →</button>
+    </form>
+
+    <p class="lead-privacy">🔒 Seus dados são privados. Sem spam.</p>
+  </div>
+</div>
 
 </body>
 </html>
