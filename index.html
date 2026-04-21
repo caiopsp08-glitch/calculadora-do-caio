@@ -242,7 +242,7 @@
       pointer-events: none;
     }
 
-    input[type="number"], select {
+    input[type="number"], input[type="text"], select {
       width: 100%; height: 52px;
       border: 1.5px solid rgba(255,255,255,0.08);
       border-radius: var(--radius-sm);
@@ -254,7 +254,7 @@
       transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
       appearance: none;
     }
-    input[type="number"]            { padding: 0 14px 0 38px; }
+    input[type="number"], input[type="text"] { padding: 0 14px 0 38px; }
     input[type="number"].no-prefix  { padding: 0 14px; }
     input[type="number"].has-suffix { padding: 0 42px 0 14px; }
     select { padding: 0 14px; cursor: pointer; }
@@ -359,6 +359,12 @@
       transform: translateY(-50%);
       font-size: 0.78rem; font-weight: 700; color: var(--muted);
     }
+    .taxa-fixed {
+      font-size: 1.1rem; font-weight: 800;
+      font-family: 'Montserrat', sans-serif;
+      color: var(--text); display: flex; align-items: baseline; gap: 3px;
+    }
+    .taxa-suffix-static { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
     .taxa-sub { font-size: 0.58rem; color: var(--muted); font-weight: 500; margin-top: 3px; }
 
     /* ── METODOLOGIA ── */
@@ -583,6 +589,40 @@
     .lead-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .lead-privacy { text-align: center; margin-top: 14px; font-size: 0.63rem; color: rgba(255,255,255,0.18); }
 
+    /* ── CENÁRIOS ── */
+    .scenario-group {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px; margin-bottom: 18px;
+    }
+    .scenario-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; padding: 12px 8px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      cursor: pointer; transition: all 0.2s;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .scenario-btn:hover { transform: translateY(-2px); }
+    .scenario-icon { font-size: 1.3rem; line-height: 1; }
+    .scenario-name { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-dim); }
+    .scenario-rate { font-size: 0.9rem; font-weight: 800; }
+
+    .scenario-btn.pessimista { border-color: rgba(239,68,68,0.25); }
+    .scenario-btn.pessimista .scenario-rate { color: #EF4444; }
+    .scenario-btn.pessimista:hover { border-color: rgba(239,68,68,0.5); background: rgba(239,68,68,0.07); box-shadow: 0 4px 16px rgba(239,68,68,0.12); }
+    .scenario-btn.pessimista.active { border-color: #EF4444; background: rgba(239,68,68,0.1); box-shadow: 0 0 18px rgba(239,68,68,0.2); }
+
+    .scenario-btn.realista { border-color: rgba(245,158,11,0.25); }
+    .scenario-btn.realista .scenario-rate { color: #F59E0B; }
+    .scenario-btn.realista:hover { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.07); box-shadow: 0 4px 16px rgba(245,158,11,0.12); }
+    .scenario-btn.realista.active { border-color: #F59E0B; background: rgba(245,158,11,0.1); box-shadow: 0 0 18px rgba(245,158,11,0.2); }
+
+    .scenario-btn.otimista { border-color: rgba(16,185,129,0.25); }
+    .scenario-btn.otimista .scenario-rate { color: #10B981; }
+    .scenario-btn.otimista:hover { border-color: rgba(16,185,129,0.5); background: rgba(16,185,129,0.07); box-shadow: 0 4px 16px rgba(16,185,129,0.12); }
+    .scenario-btn.otimista.active { border-color: #10B981; background: rgba(16,185,129,0.1); box-shadow: 0 0 18px rgba(16,185,129,0.2); }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 760px) {
       header { padding: 16px 20px; flex-wrap: wrap; gap: 14px; }
@@ -653,10 +693,12 @@
       <label>Aporte inicial</label>
       <div class="input-wrap">
         <span class="input-prefix">R$</span>
-        <input type="number" id="inicial" min="0" step="500" value="5000" oninput="syncSlider('inicial');calcular()" />
+        <input type="text" inputmode="decimal" id="inicial" value="5.000,00"
+          oninput="syncSlider('inicial');calcular()"
+          onfocus="focusMoney(this)" onblur="blurMoney(this,'inicial')" />
       </div>
       <div class="range-wrap">
-        <input type="range" id="sl-inicial" min="0" max="500000" step="500" value="5000" oninput="syncInput('inicial');updateFill(this);calcular()" />
+        <input type="range" id="sl-inicial" min="0" max="500000" step="500" value="5000" oninput="syncMoneyInput('inicial');updateFill(this);calcular()" />
         <div class="range-labels"><span>R$ 0</span><span>R$ 500k</span></div>
       </div>
     </div>
@@ -665,32 +707,56 @@
       <label>Aporte mensal</label>
       <div class="input-wrap">
         <span class="input-prefix">R$</span>
-        <input type="number" id="mensal" min="0" step="100" value="500" oninput="syncSlider('mensal');calcular()" />
+        <input type="text" inputmode="decimal" id="mensal" value="500,00"
+          oninput="syncSlider('mensal');calcular()"
+          onfocus="focusMoney(this)" onblur="blurMoney(this,'mensal')" />
       </div>
       <div class="range-wrap">
-        <input type="range" id="sl-mensal" min="0" max="50000" step="100" value="500" oninput="syncInput('mensal');updateFill(this);calcular()" />
+        <input type="range" id="sl-mensal" min="0" max="50000" step="100" value="500" oninput="syncMoneyInput('mensal');updateFill(this);calcular()" />
         <div class="range-labels"><span>R$ 0</span><span>R$ 50k</span></div>
       </div>
     </div>
 
-    <div class="two-col">
-      <div class="field">
-        <label>Taxa de juros</label>
-        <div class="input-wrap">
-          <input type="number" id="taxa" class="has-suffix" min="0" step="0.1" value="1" oninput="syncSlider('taxa');calcular()" />
-          <span class="input-suffix">%</span>
-        </div>
-        <div class="range-wrap">
-          <input type="range" id="sl-taxa" min="0" max="5" step="0.05" value="1" oninput="syncInput('taxa');updateFill(this);calcular()" />
-          <div class="range-labels"><span>0%</span><span>5%</span></div>
-        </div>
+    <div class="field">
+      <label>Taxa de juros — escolha um cenário ou ajuste manualmente</label>
+      <div class="scenario-group">
+        <button class="scenario-btn pessimista" onclick="setScenario(8, this)">
+          <span class="scenario-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="3,5 9,13 15,5" stroke="#EF4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="scenario-name">Pessimista</span>
+          <span class="scenario-rate">8% a.a.</span>
+        </button>
+        <button class="scenario-btn realista active" onclick="setScenario(11, this)">
+          <span class="scenario-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><line x1="3" y1="9" x2="15" y2="9" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round"/></svg>
+          </span>
+          <span class="scenario-name">Realista</span>
+          <span class="scenario-rate">11% a.a.</span>
+        </button>
+        <button class="scenario-btn otimista" onclick="setScenario(13, this)">
+          <span class="scenario-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="3,13 9,5 15,13" stroke="#10B981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="scenario-name">Otimista</span>
+          <span class="scenario-rate">13% a.a.</span>
+        </button>
       </div>
-      <div class="field">
-        <label>Período</label>
-        <div class="toggle-group" id="periodoToggle">
-          <button class="active" data-val="mes" onclick="setTipo(this)">Mês</button>
-          <button data-val="ano" onclick="setTipo(this)">Ano</button>
-        </div>
+      <div class="input-wrap">
+        <input type="number" id="taxa" class="has-suffix" min="0" max="30" step="0.1" value="11" oninput="clearScenario();syncSlider('taxa');calcular()" />
+        <span class="input-suffix">%</span>
+      </div>
+      <div class="range-wrap">
+        <input type="range" id="sl-taxa" min="0" max="30" step="0.25" value="11" oninput="clearScenario();syncInput('taxa');updateFill(this);calcular()" />
+        <div class="range-labels"><span>0%</span><span>30%</span></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Período</label>
+      <div class="toggle-group" id="periodoToggle">
+        <button data-val="mes" onclick="setTipo(this)">Mês</button>
+        <button class="active" data-val="ano" onclick="setTipo(this)">Ano</button>
       </div>
     </div>
 
@@ -719,28 +785,24 @@
 
   <div class="card">
     <div class="card-title">Comparativo de taxas</div>
+    <input type="hidden" id="taxaSelic" value="9.34" />
+    <input type="hidden" id="taxaPoup" value="6.54" />
     <div class="taxas-grid">
       <div class="taxa-item">
         <div class="taxa-label"><span class="dot dot-selic"></span> Selic</div>
-        <div class="taxa-input-wrap">
-          <input type="number" class="taxa-input" id="taxaSelic" value="9.34" min="0" step="0.25" oninput="calcular()" />
-          <span class="taxa-suffix">% a.a.</span>
-        </div>
+        <div class="taxa-fixed">9,34<span class="taxa-suffix-static">% a.a.</span></div>
         <div class="taxa-sub">Média histórica 2015–2024</div>
       </div>
       <div class="taxa-item">
         <div class="taxa-label"><span class="dot dot-poup"></span> Poupança</div>
-        <div class="taxa-input-wrap">
-          <input type="number" class="taxa-input" id="taxaPoup" value="6.54" min="0" step="0.1" oninput="calcular()" />
-          <span class="taxa-suffix">% a.a.</span>
-        </div>
-        <div class="taxa-sub">70% × média Selic (Selic &gt; 8,5%)</div>
+        <div class="taxa-fixed">6,54<span class="taxa-suffix-static">% a.a.</span></div>
+        <div class="taxa-sub">70% × Selic (Selic &gt; 8,5%)</div>
       </div>
     </div>
     <div class="metodologia-box">
       <span class="met-icon">📊</span>
       <div>
-        <strong>Metodologia:</strong> taxas baseadas na <strong>média histórica da Selic dos últimos 10 anos (2015–2024) = 9,34% a.a.</strong> A Poupança segue a regra vigente: 70% da Selic quando a taxa supera 8,5% a.a. (resultado: 6,54% a.a.). Você pode editar os valores acima a qualquer momento.
+        <strong>Metodologia:</strong> taxas baseadas na <strong>média histórica da Selic dos últimos 10 anos (2015–2024) = 9,34% a.a.</strong> A Poupança segue a regra vigente: 70% da Selic quando a taxa supera 8,5% a.a. (resultado: 6,54% a.a.).
       </div>
     </div>
   </div>
@@ -788,7 +850,7 @@
 </main>
 
 <script>
-  let tipoTaxa = 'mes';
+  let tipoTaxa = 'ano';
   let chartInstance = null;
   let animFrame = null;
 
@@ -800,14 +862,63 @@
     slider.style.setProperty('--fill', pct + '%');
   }
 
-  function syncSlider(id) {
-    const v = parseFloat(document.getElementById(id).value) || 0;
+  /* ---- MONEY FORMATTING ---- */
+  function parseMoney(str) {
+    if (!str) return 0;
+    // "1.234.567,89" → 1234567.89
+    return parseFloat(String(str).replace(/\./g, '').replace(',', '.')) || 0;
+  }
+  function formatMoney(num) {
+    return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function focusMoney(input) {
+    const num = parseMoney(input.value);
+    input.value = num ? String(num).replace('.', ',') : '';
+    input.select();
+  }
+  function blurMoney(input, id) {
+    const num = parseMoney(input.value);
+    input.value = formatMoney(num);
     const sl = document.getElementById('sl-' + id);
-    if (sl) { sl.value = v; updateFill(sl); }
+    if (sl) { sl.value = num; updateFill(sl); }
+    calcular();
+  }
+
+  function syncSlider(id) {
+    const moneyIds = ['inicial', 'mensal'];
+    if (moneyIds.includes(id)) {
+      const v = parseMoney(document.getElementById(id).value);
+      const sl = document.getElementById('sl-' + id);
+      if (sl) { sl.value = v; updateFill(sl); }
+    } else {
+      const v = parseFloat(document.getElementById(id).value) || 0;
+      const sl = document.getElementById('sl-' + id);
+      if (sl) { sl.value = v; updateFill(sl); }
+    }
   }
   function syncInput(id) {
     const v = parseFloat(document.getElementById('sl-' + id).value) || 0;
     document.getElementById(id).value = v;
+  }
+  function syncMoneyInput(id) {
+    const v = parseFloat(document.getElementById('sl-' + id).value) || 0;
+    document.getElementById(id).value = formatMoney(v);
+  }
+
+  /* ---- SCENARIOS ---- */
+  function setScenario(rate, btn) {
+    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('taxa').value = rate;
+    // força tipo = ano
+    document.querySelectorAll('#periodoToggle button').forEach(b => b.classList.remove('active'));
+    document.querySelector('#periodoToggle button[data-val="ano"]').classList.add('active');
+    tipoTaxa = 'ano';
+    syncSlider('taxa');
+    calcular();
+  }
+  function clearScenario() {
+    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
   }
 
   function setTipo(btn) {
@@ -865,8 +976,8 @@
   let prevTotal = 0;
 
   function calcular() {
-    const inicial  = parseFloat(document.getElementById('inicial').value) || 0;
-    const mensal   = parseFloat(document.getElementById('mensal').value) || 0;
+    const inicial  = parseMoney(document.getElementById('inicial').value);
+    const mensal   = parseMoney(document.getElementById('mensal').value);
     let   taxa     = parseFloat(document.getElementById('taxa').value) || 0;
     const prazo    = parseInt(document.getElementById('prazo').value) || 0;
     const unidade  = document.getElementById('prazoUnidade').value;
@@ -986,6 +1097,11 @@
 
   window.addEventListener('load', () => {
     document.querySelectorAll('input[type="range"]').forEach(updateFill);
+    // format initial money values
+    ['inicial','mensal'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = formatMoney(parseMoney(el.value));
+    });
     calcular();
   });
 
