@@ -257,7 +257,13 @@
     input[type="number"], input[type="text"] { padding: 0 14px 0 38px; }
     input[type="number"].no-prefix  { padding: 0 14px; }
     input[type="number"].has-suffix { padding: 0 42px 0 14px; }
-    select { padding: 0 14px; cursor: pointer; }
+    select {
+      padding: 0 36px 0 14px; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpolyline points='2,4 6,8 10,4' stroke='%235A6A8A' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+    select option { background: #0D1829; color: var(--text); }
 
     input:focus, select:focus {
       border-color: rgba(79,143,255,0.55);
@@ -420,13 +426,67 @@
       color: var(--blue); margin-bottom: 10px;
     }
     .value-hero {
-      font-size: clamp(1.4rem, 5vw, 2rem);
+      font-size: clamp(1.9rem, 7vw, 2.8rem);
       font-weight: 900; font-family: 'Syne', sans-serif;
       color: var(--text);
-      letter-spacing: -1px; line-height: 1.1;
-      text-shadow: 0 0 40px rgba(79,143,255,0.3);
+      letter-spacing: -1.5px; line-height: 1;
+      text-shadow: 0 0 50px rgba(79,143,255,0.35);
       word-break: break-word; overflow-wrap: break-word;
+      transition: text-shadow 0.3s;
     }
+    @keyframes pulse-glow {
+      0%   { text-shadow: 0 0 50px rgba(79,143,255,0.35); }
+      50%  { text-shadow: 0 0 70px rgba(79,143,255,0.65), 0 0 120px rgba(79,143,255,0.2); }
+      100% { text-shadow: 0 0 50px rgba(79,143,255,0.35); }
+    }
+    .value-hero.updating { animation: pulse-glow 0.7s ease; }
+
+    /* ── SPLIT BAR ── */
+    .split-bar {
+      display: flex; height: 5px; border-radius: 3px;
+      overflow: hidden; margin: 14px 0 8px;
+      background: rgba(255,255,255,0.06);
+    }
+    .split-fill { height: 100%; transition: width 0.7s cubic-bezier(0.16,1,0.3,1); }
+    .split-invested { background: var(--blue); opacity: 0.6; }
+    .split-interest { background: var(--green); }
+    .split-labels {
+      display: flex; justify-content: space-between;
+      font-size: 0.58rem; font-weight: 600; color: var(--muted);
+    }
+    .split-labels .lbl-invested { color: rgba(79,143,255,0.7); }
+    .split-labels .lbl-interest { color: rgba(16,185,129,0.8); }
+
+    /* ── CTA CARD ── */
+    .cta-card {
+      background: linear-gradient(135deg, rgba(79,143,255,0.1) 0%, rgba(16,185,129,0.06) 100%);
+      border: 1px solid rgba(79,143,255,0.2);
+      border-radius: var(--radius);
+      padding: 24px 22px;
+      margin-bottom: 16px;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+      animation: fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .cta-card h3 {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: 1rem; color: var(--text); margin-bottom: 6px;
+    }
+    .cta-card p {
+      font-size: 0.72rem; color: var(--text-dim);
+      line-height: 1.6; margin-bottom: 18px;
+    }
+    .btn-cta-whatsapp {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 12px 24px; border-radius: 12px;
+      background: #25D366; color: #fff;
+      text-decoration: none; font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 0.78rem; letter-spacing: 1px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.3);
+    }
+    .btn-cta-whatsapp:hover { background: #20BA5A; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,211,102,0.4); }
+    .btn-cta-whatsapp svg { width: 18px; height: 18px; flex-shrink: 0; }
     .value-sub {
       font-size: 0.68rem; color: var(--muted);
       font-weight: 500; margin-top: 10px; letter-spacing: 0.5px;
@@ -604,9 +664,10 @@
       font-family: 'Montserrat', sans-serif;
     }
     .scenario-btn:hover { transform: translateY(-2px); }
-    .scenario-icon { font-size: 1.3rem; line-height: 1; }
+    .scenario-icon { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; }
+    .scenario-icon svg { width: 20px; height: 20px; }
     .scenario-name { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-dim); }
-    .scenario-rate { font-size: 0.9rem; font-weight: 800; }
+    .scenario-rate { font-size: 0.95rem; font-weight: 800; }
 
     .scenario-btn.pessimista { border-color: rgba(239,68,68,0.25); }
     .scenario-btn.pessimista .scenario-rate { color: #EF4444; }
@@ -815,6 +876,14 @@
         <div class="label-hero">Valor final acumulado</div>
         <div class="value-hero" id="r-total">—</div>
         <div class="value-sub" id="r-sub">—</div>
+        <div class="split-bar" id="splitBar">
+          <div class="split-fill split-invested" id="splitInvested" style="width:50%"></div>
+          <div class="split-fill split-interest" id="splitInterest" style="width:50%"></div>
+        </div>
+        <div class="split-labels">
+          <span class="lbl-invested" id="splitLblInvested">— investido</span>
+          <span class="lbl-interest" id="splitLblInterest">— em juros</span>
+        </div>
       </div>
       <div class="result-grid-2">
         <div class="r-item">
@@ -838,6 +907,17 @@
       <div class="chart-wrap">
         <canvas id="myChart"></canvas>
       </div>
+    </div>
+
+    <div class="cta-card">
+      <h3>Quer entender melhor o seu cenário?</h3>
+      <p>Cada perfil de investidor é único. Agende uma conversa gratuita e descubra a melhor estratégia para a sua realidade.</p>
+      <a class="btn-cta-whatsapp"
+         href="https://wa.me/5535999380818?text=Ol%C3%A1%20Caio%2C%20fiz%20a%20simulação%20e%20gostaria%20de%20entender%20melhor%20meu%20cenário%20de%20investimento."
+         target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.123 1.528 5.857L.057 23.882l6.233-1.464A11.935 11.935 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.013-1.374l-.36-.213-3.7.868.933-3.617-.234-.37A9.818 9.818 0 1112 21.818z"/></svg>
+        Falar com Caio no WhatsApp
+      </a>
     </div>
 
   </div>
@@ -1023,8 +1103,20 @@
     const wasHidden = section.style.display !== 'block';
     section.style.display = 'block';
 
-    animateValue(document.getElementById('r-total'), prevTotal, user.final, 700);
+    const heroEl = document.getElementById('r-total');
+    heroEl.classList.remove('updating');
+    void heroEl.offsetWidth;
+    heroEl.classList.add('updating');
+    animateValue(heroEl, prevTotal, user.final, 700);
     prevTotal = user.final;
+
+    // split bar
+    const investPct = (totalInvestido / user.final * 100).toFixed(1);
+    const jurosPct  = (juros / user.final * 100).toFixed(1);
+    document.getElementById('splitInvested').style.width = investPct + '%';
+    document.getElementById('splitInterest').style.width = jurosPct + '%';
+    document.getElementById('splitLblInvested').textContent = investPct + '% investido';
+    document.getElementById('splitLblInterest').textContent = jurosPct + '% em juros';
 
     document.getElementById('r-investido').textContent = fmt(totalInvestido);
     document.getElementById('r-juros').textContent     = fmt(juros);
